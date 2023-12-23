@@ -3,6 +3,7 @@ pipeline{
     tools{
         jdk 'jdk17'
         nodejs 'node16'
+        maven 'maven'
     }
     environment {
         SCANNER_HOME=tool 'sonar-scanner'
@@ -35,11 +36,16 @@ pipeline{
                 }
             } 
         }
-        stage('Install Dependencies') {
-            steps {
-                sh "npm install"
-            }
-        }
+        // stage('Install Dependencies') {
+        //     steps {
+        //         sh "npm install"
+        //     }
+        // }
+        // stage('Maven Build'){
+        //     steps{
+        //         sh 'mvn clean package'
+        //     }
+        // }
         stage('OWASP FS SCAN') {
             steps {
                 dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
@@ -54,17 +60,18 @@ pipeline{
         stage("Docker Build & Push"){
             steps{
                 script{
-                   withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){   
-                       sh "docker build -t rameshkumarverma/MyProjectApp ."
-                       // sh "docker tag tetrisv2 sevenajay/tetrisv2:latest "
-                       sh "docker push rameshkumarverma/MyProjectApp:latest "
+                   withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){ 
+                       sh "docker pull chydinma/app:1"
+                    //   sh "docker build -t rameshkumarverma/myprojectapp ."
+                       sh "docker tag chydinma/app:1 rameshkumarverma/myprojectapp:latest"
+                       sh "docker push rameshkumarverma/myprojectapp:latest "
                     }
                 }
             }
         }
         stage("TRIVY"){
             steps{
-                sh "trivy image rameshkumarverma/MyProjectApp:latest > trivyimage.txt" 
+                sh "trivy image rameshkumarverma/myprojectapp:latest > trivyimage.txt" 
             }
         }
         stage('Deploy to Kubernets'){
@@ -80,6 +87,7 @@ pipeline{
                 }
             }
         }
+    }
     //     stage('Checkout Code') {
     //         steps {
     //             git branch: 'main', url: 'https://github.com/Aj7Ay/Tetris-manifest.git'
