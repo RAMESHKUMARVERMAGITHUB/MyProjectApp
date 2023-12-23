@@ -17,14 +17,14 @@ pipeline{
         }
         stage('Checkout from Git'){
             steps{
-                git branch: 'main', url: 'https://github.com/rameshkumarvermagithub/Tetris-V1.git'
+                git branch: 'main', url: 'https://github.com/rameshkumarvermagithub/MyProjectApp.git'
             }
         }
         stage("Sonarqube Analysis "){
             steps{
                 withSonarQubeEnv('sonar-server') {
-                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=TetrisVersion1.0 \
-                    -Dsonar.projectKey=TetrisVersion1.0 '''
+                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=MyProjectApp \
+                    -Dsonar.projectKey=MyProjectApp '''
                 }
             }
         }
@@ -55,16 +55,16 @@ pipeline{
             steps{
                 script{
                    withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){   
-                       sh "docker build -t rameshkumarverma/tetrisv2 ."
+                       sh "docker build -t rameshkumarverma/MyProjectApp ."
                        // sh "docker tag tetrisv2 sevenajay/tetrisv2:latest "
-                       sh "docker push rameshkumarverma/tetrisv2:latest "
+                       sh "docker push rameshkumarverma/MyProjectApp:latest "
                     }
                 }
             }
         }
         stage("TRIVY"){
             steps{
-                sh "trivy image rameshkumarverma/tetrisv2:latest > trivyimage.txt" 
+                sh "trivy image rameshkumarverma/MyProjectApp:latest > trivyimage.txt" 
             }
         }
         stage('Deploy to Kubernets'){
