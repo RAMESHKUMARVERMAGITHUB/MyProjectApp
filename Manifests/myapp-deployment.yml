@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: myapp
-        image: chydinma/myapp
+        image: rameshkumarverma/MyProjectApp
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
